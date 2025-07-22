@@ -1,24 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function App() {
   const [task, setTask] = useState('');
-  const [taskList, setTaskList] = useState([]);
+  const [taskList, setTaskList] = useState(() => {
+    // Load tasks from localStorage on first render
+    const saved = localStorage.getItem('tasks');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Save tasks to localStorage whenever taskList changes
+  useEffect(() => {
+    localStorage.setItem('tasks', JSON.stringify(taskList));
+  }, [taskList]);
 
   const handleAdd = () => {
     if (task.trim() === '') return;
-    setTaskList([...taskList, { text: task, done: false }]);
+    const newTask = { text: task, done: false };
+    setTaskList([...taskList, newTask]);
     setTask('');
   };
 
   const handleToggleDone = (index) => {
-    const newList = [...taskList];
-    newList[index].done = !newList[index].done;
-    setTaskList(newList);
+    const updated = [...taskList];
+    updated[index].done = !updated[index].done;
+    setTaskList(updated);
   };
 
   const handleDelete = (index) => {
-    const newList = taskList.filter((_, i) => i !== index);
-    setTaskList(newList);
+    const updated = taskList.filter((_, i) => i !== index);
+    setTaskList(updated);
   };
 
   return (
@@ -35,13 +45,21 @@ function App() {
       <ul>
         {taskList.map((t, index) => (
           <li key={index} style={{ marginBottom: '8px' }}>
-            <span style={{ textDecoration: t.done ? 'line-through' : 'none', marginRight: '10px' }}>
+            <span
+              style={{
+                textDecoration: t.done ? 'line-through' : 'none',
+                marginRight: '10px',
+              }}
+            >
               {t.text}
             </span>
             <button onClick={() => handleToggleDone(index)}>
               {t.done ? 'Undo' : 'Mark as Done'}
             </button>
-            <button onClick={() => handleDelete(index)} style={{ marginLeft: '5px' }}>
+            <button
+              onClick={() => handleDelete(index)}
+              style={{ marginLeft: '5px' }}
+            >
               Delete
             </button>
           </li>
