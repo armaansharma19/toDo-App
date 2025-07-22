@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import './App.css'; // <- import the CSS file
 
 function App() {
   const [task, setTask] = useState('');
   const [taskList, setTaskList] = useState(() => {
-    // Load tasks from localStorage on first render
     const saved = localStorage.getItem('tasks');
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Save tasks to localStorage whenever taskList changes
   useEffect(() => {
     localStorage.setItem('tasks', JSON.stringify(taskList));
   }, [taskList]);
@@ -32,36 +31,28 @@ function App() {
   };
 
   return (
-    <div style={{ marginLeft: "100px" }}>
+    <div className="container">
       <h2>Todo List</h2>
-      <input
-        type="text"
-        value={task}
-        onChange={(e) => setTask(e.target.value)}
-        placeholder="Enter your task"
-      />
-      <button onClick={handleAdd}>Add Task</button>
+      <div className="input-group">
+        <input
+          type="text"
+          value={task}
+          onChange={(e) => setTask(e.target.value)}
+          placeholder="Enter your task"
+        />
+        <button onClick={handleAdd}>Add Task</button>
+      </div>
 
-      <ul>
+      <ul className="task-list">
         {taskList.map((t, index) => (
-          <li key={index} style={{ marginBottom: '8px' }}>
-            <span
-              style={{
-                textDecoration: t.done ? 'line-through' : 'none',
-                marginRight: '10px',
-              }}
-            >
-              {t.text}
-            </span>
-            <button onClick={() => handleToggleDone(index)}>
-              {t.done ? 'Undo' : 'Mark as Done'}
-            </button>
-            <button
-              onClick={() => handleDelete(index)}
-              style={{ marginLeft: '5px' }}
-            >
-              Delete
-            </button>
+          <li key={index} className="task-item">
+            <span className={t.done ? 'done' : ''}>{t.text}</span>
+            <div className="actions">
+              <button onClick={() => handleToggleDone(index)}>
+                {t.done ? 'Undo' : 'Mark as Done'}
+              </button>
+              <button onClick={() => handleDelete(index)}>Delete</button>
+            </div>
           </li>
         ))}
       </ul>
